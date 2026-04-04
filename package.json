@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "slack": "^11.0.2"
+  }
+}

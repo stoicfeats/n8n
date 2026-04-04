@@ -12,3 +12,14 @@ node_modules/
 dist/
 .env
 *.log
+
+# Documentation, Phases and Blogs
+AWS_DEPLOYMENT_GUIDE.md
+Advanced_Concepts_Backlog.md
+GCP_DEPLOYMENT_GUIDE.md
+Hosting_Concepts_Blog.md
+Phase_1_Authentication_and_Triggers.md
+Phase_2_AI_Integration_and_Prompt_Engineering.md
+Phase_3_Architectural_Routing_and_Automation_Logic.md
+Portfolio_Display_Strategy.md
+Portfolio_Frontend_Prompts.md

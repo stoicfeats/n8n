@@ -1,0 +1,203 @@
+{
+  "name": "Smart Email Triage System",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "readStatus": "unread"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5e978777-309f-4cb9-a83f-325c026191d3",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-nano",
+          "mode": "list",
+          "cachedResultName": "GPT-5-NANO"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Subject :{{ $json.Subject }}\nBody : {{ $json.snippet }}"
+            },
+            {
+              "role": "system",
+              "content": "=You are an elite executive assistant API. Your sole purpose is to analyze incoming emails and classify them. \n\nAvailable Categories:\n1. \"Manager Priority\"\n2. \"Customer Support\"\n3. \"Archive\"\n\nCRITICAL: You MUST respond with ONLY a valid JSON object. Do not include any introductory or concluding text. Do not wrap the output in markdown code blocks.\n\nYour response must start with '{' and end with '}' and exactly match this schema:\n{\n  \"category\": \"category matched from the list above\",\n  \"summary\": \"1-sentence summary\",\n  \"requires_slack_alert\": false\n}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        16
+      ],
+      "id": "5a086c74-974d-4592-a0d5-07e9da94880e",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "{{ $json.output[0].content[0].text.category }}",
+                    "rightValue": "Manager Priority",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2d173f1f-cde3-4efb-b150-e4ce568118e5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "0"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ad25ad7b-8d66-4525-86db-45a51a64e345",
+                    "leftValue": "{{ $json.output[0].content[0].text.category }}",
+                    "rightValue": "Customer Support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "43cc4841-172e-4eec-9241-d0364f54936d",
+                    "leftValue": "={{ $json.output[0].content[0].text.category }}",
+                    "rightValue": "Archive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        16
+      ],
+      "id": "8eda1a5b-a9a8-4f06-9261-6231ce7420d0",
+      "name": "Switch"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "633f86a8-6314-4ce1-9d3e-fb1b92e3176a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3030dcacc185e0af5e5efe63c05b7aa5045ca5e5994393eb1b60a54ba3dfa5fa"
+  },
+  "id": "bws32SexNt2QD8yv",
+  "tags": []
+}
