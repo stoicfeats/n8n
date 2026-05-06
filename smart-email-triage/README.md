@@ -20,7 +20,7 @@ A production-grade, AI-powered email triage automation built with n8n, OpenAI, G
 
 ## 🛠️ How to Clone & Use This Yourself
 
-### 1. Import Workflow to Your n8n Instance
+### 1. Import Workflow to Your n8n Instance ( locally )
 1. Open your n8n dashboard.
 2. Go to your Workflows list and click **Import from File**.
 3. Select the `smart_email_triage.json` file from this repository.
